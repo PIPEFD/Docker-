@@ -1,62 +1,61 @@
-# 🐳 Docker - 📖 Introducción y 🚀 Proyecto Inception
+🐳 Docker - 📖 Introducción y 🚀 Proyecto Inception
 
-## 🐋 ¿Qué es Docker?
-Docker es una 🚢 plataforma que permite desarrollar, enviar y ejecutar 📦 aplicaciones mediante contenedores ligeros y portátiles. Estos contenedores incluyen todo lo necesario para ejecutar la aplicación, como 🖥️ código, 📚 dependencias, 📖 bibliotecas y ⚙️ configuraciones específicas, asegurando que funcionen consistentemente en diferentes 🌍 entornos.
+🐋 ¿Qué es Docker?
 
-Para una guía más detallada y oficial sobre Docker, visita la [📖 documentación oficial de Docker](https://docs.docker.com/).
+Docker es una 🚢 plataforma que permite desarrollar, enviar y ejecutar 📦 aplicaciones mediante contenedores ligeros y portátiles. Estos contenedores incluyen todo lo necesario para ejecutar la aplicación, como 💻 código, 📚 dependencias, 📖 bibliotecas y ⚙️ configuraciones específicas, asegurando que funcionen consistentemente en diferentes 🌍 entornos.
 
-## 📁 Estructura básica de Docker
+Para una guía más detallada y oficial sobre Docker, visita la 📖 documentación oficial de Docker.
 
-- 📄 **Dockerfile:** Archivo que define la configuración del contenedor, desde la imagen base, instalación de dependencias, hasta ejecución de comandos necesarios.
-- 🖼️ **Docker Image:** Resultado de compilar el Dockerfile. Es un 📦 paquete ligero y ejecutable.
-- 📦 **Docker Container:** Instancia ejecutable de una imagen.
-- 🔧 **Docker Compose:** Herramienta que permite definir y ejecutar aplicaciones Docker con múltiples 📦 contenedores mediante un archivo YAML (`docker-compose.yml`).
+📁 Estructura básica de Docker
 
-## 🔄 Funcionamiento general
+📄 Dockerfile: Archivo que define la configuración del contenedor, desde la imagen base, instalación de dependencias, hasta ejecución de comandos necesarios.
 
-1. Se crea un 📄 **Dockerfile** especificando una 🖼️ imagen base y comandos para configurar el entorno.
-2. Se genera una 🖼️ **imagen Docker** ejecutando `docker build`.
-3. Se ejecuta la imagen generada como 📦 **contenedor** usando `docker run`.
-4. Para gestionar múltiples servicios interconectados, se usa 🔧 **Docker Compose**, facilitando el despliegue y comunicación entre contenedores.
+🖼️ Docker Image: Resultado de compilar el Dockerfile. Es un 📦 paquete ligero y ejecutable.
 
-## 🛠️ Instalación detallada de Docker en Ubuntu (WSL2) - Versión requerida por el proyecto Inception: Docker Engine estable más reciente compatible con Ubuntu según la documentación oficial
+📦 Docker Container: Instancia ejecutable de una imagen.
 
-Para la instalación oficial y actualizada de Docker en Ubuntu (WSL2), sigue las instrucciones en la [📖 documentación oficial de Docker para Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
+🔧 Docker Compose: Herramienta que permite definir y ejecutar aplicaciones Docker con múltiples 📦 contenedores mediante un archivo YAML (docker-compose.yml).
 
-### 🚩 Resumen rápido de instalación:
+♻️ Funcionamiento general
 
-1. 🔃 Actualizar paquetes del sistema:
-```bash
+Se crea un 📄 Dockerfile especificando una 🖼️ imagen base y comandos para configurar el entorno.
+
+Se genera una 🖼️ imagen Docker ejecutando docker build.
+
+Se ejecuta la imagen generada como 📦 contenedor usando docker run.
+
+Para gestionar múltiples servicios interconectados, se usa 🔧 Docker Compose, facilitando el despliegue y comunicación entre contenedores.
+
+🛠️ Instalación detallada de Docker en Ubuntu (WSL2) - Versión requerida por el proyecto Inception: Docker Engine estable más reciente compatible con Ubuntu según la documentación oficial
+
+Para la instalación oficial y actualizada de Docker en Ubuntu (WSL2), sigue las instrucciones en la 📖 documentación oficial de Docker para Ubuntu.
+
+🚩 Resumen rápido de instalación:
+
+🔃 Actualizar paquetes del sistema:
+
 sudo apt update
 sudo apt upgrade -y
-```
 
-2. 📥 Instalar dependencias necesarias:
-```bash
+📅 Instalar dependencias necesarias:
+
 sudo apt install -y ca-certificates curl gnupg lsb-release
-```
 
-3. 🔑 Añadir clave GPG y repositorio oficial de Docker:
-```bash
+🔑 Añadir clave GPG y repositorio oficial de Docker:
+
 🛠️ Paso 3 - Añadir clave GPG y repositorio oficial de Docker
 🔒 1. Crear directorio para las claves:
-bash
-Copiar
-Editar
+
 sudo mkdir -p /etc/apt/keyrings
 Esto crea el directorio donde se almacenarán las claves GPG usadas para verificar que los paquetes que vas a instalar son auténticos.
 
 🔑 2. Descargar y guardar la clave GPG oficial de Docker:
-bash
-Copiar
-Editar
+
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 Este comando descarga la clave de autenticación de Docker y la convierte al formato apropiado (.gpg) para que el sistema pueda usarla.
 
 📦 3. Añadir el repositorio de Docker a la lista de fuentes APT:
-bash
-Copiar
-Editar
+
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/ubuntu \
@@ -68,12 +67,7 @@ arch=$(dpkg --print-architecture): detecta si tu sistema es amd64, arm64, etc.
 
 $(lsb_release -cs): obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
 
-
-```
-
-<!-- 4.  Instalar Docker Engine: -->
-
-🧰 📦 Paso 4 - Instalar Docker Engine y herramientas asociadas
+🧰📦 Paso 4 - Instalar Docker Engine y herramientas asociadas
 Primero, actualiza la lista de paquetes, ya que acabamos de añadir un nuevo repositorio:
 
 bash
@@ -87,28 +81,29 @@ Copiar
 Editar
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 🧩 ¿Qué estás instalando exactamente?
-- docker-ce: Docker Community Edition (el motor principal de Docker).
 
-- docker-ce-cli: La interfaz de línea de comandos de Docker (docker).
+docker-ce: Docker Community Edition (el motor principal de Docker).
 
-- containerd.io: El runtime que ejecuta contenedores.
+docker-ce-cli: La interfaz de línea de comandos de Docker (docker).
 
-- docker-buildx-plugin: Permite crear imágenes multiplataforma.
+containerd.io: El runtime que ejecuta contenedores.
 
-- docker-compose-plugin: Permite usar docker compose (nueva versión integrada del clásico docker-compose).
+docker-buildx-plugin: Permite crear imágenes multiplataforma.
+
+docker-compose-plugin: Permite usar docker compose (nueva versión integrada del clásico docker-compose).
 
 📌 Importante: según el subject de Inception, no puedes usar imágenes listas de DockerHub (excepto Alpine/Debian). Esto implica que deberás construir tus propias imágenes más adelante, y estos componentes son clave para lograrlo.
 
-
 👤 Paso 5 - Usar Docker como usuario no-root
-1. Agrega tu usuario al grupo docker:
+
+Agrega tu usuario al grupo docker:
 bash
 Copiar
 Editar
 sudo usermod -aG docker $USER
 Esto le dice al sistema: “Este usuario tiene permiso para usar Docker sin necesidad de sudo”.
 
-2. Aplica el cambio con este comando:
+Aplica el cambio con este comando:
 bash
 Copiar
 Editar
@@ -124,11 +119,10 @@ Este comando ejecutará un contenedor de prueba. Si ves un mensaje que dice algo
 
 Hello from Docker!
 
-
-⚙️ Paso 6 (Opcional) - Iniciar Docker automáticamente al abrir WSL2
+️ Paso 6 (Opcional) - Iniciar Docker automáticamente al abrir WSL2
 Por defecto, Docker no arranca solo dentro de WSL2. Si quieres que se inicie automáticamente cada vez que abras tu terminal, puedes automatizarlo con este pequeño truco:
 
-📥 Añadir al .bashrc:
+📅 Añadir al .bashrc:
 bash
 Copiar
 Editar
@@ -137,7 +131,7 @@ Esto añadirá una línea al final de tu archivo .bashrc, que es ejecutado cada 
 
 🧠 Nota: Esto no es necesario si usas Docker Desktop para WSL2 o si inicias el servicio manualmente con sudo service docker start.
 
-🌀 Aplica los cambios:
+🔀 Aplica los cambios:
 bash
 Copiar
 Editar
@@ -149,42 +143,47 @@ Copiar
 Editar
 sudo service docker start
 
-7. ✅ Verificar instalación:
-```bash
-docker run hello-world
-```
+✅ Verificar instalación:
 
-## 🚧 Proyecto Inception
+docker run hello-world
+
+🚧 Proyecto Inception
 
 Este proyecto tiene como objetivo profundizar en conocimientos de administración de sistemas utilizando Docker. Debe configurarse una infraestructura virtual con estos componentes:
 
-- 🌐 **NGINX:** Servidor web configurado con protocolo TLSv1.2 o TLSv1.3.
-- 📝 **WordPress:** Aplicación web usando PHP-FPM.
-- 🗃️ **MariaDB:** Base de datos para almacenar información de WordPress.
+🌐 NGINX: Servidor web configurado con protocolo TLSv1.2 o TLSv1.3.
 
-### 🔑 Requisitos clave del proyecto
-- Usar Alpine o Debian (penúltima versión estable).
-- Cada servicio en un contenedor independiente.
-- Uso obligatorio de variables de entorno y `.env`.
-- 🔒 Gestión segura de contraseñas y secretos (no en Dockerfiles).
-- 🌐 Comunicación mediante red Docker específica.
-- 💾 Persistencia de datos usando volúmenes Docker.
+📝 WordPress: Aplicación web usando PHP-FPM.
 
-### 🖥️ Diagrama visual simplificado del proyecto:
+🗃️ MariaDB: Base de datos para almacenar información de WordPress.
 
-```
+🔑 Requisitos clave del proyecto
+
+Usar Alpine o Debian (penúltima versión estable).
+
+Cada servicio en un contenedor independiente.
+
+Uso obligatorio de variables de entorno y .env.
+
+🔒 Gestión segura de contraseñas y secretos (no en Dockerfiles).
+
+🌐 Comunicación mediante red Docker específica.
+
+📂 Persistencia de datos usando volúmenes Docker.
+
+💻 Diagrama visual simplificado del proyecto:
+
 👤 Usuario
    │
    │ HTTPS (443, TLS)
    ▼
-🌐 NGINX Container ────────────┐
+🌐 NGINX Container ─────────────────────┐
    │                        │
    ▼                        ▼
 📝 WordPress Container ──▶ 🗃️ MariaDB Container
-```
 
-### 📂 Estructura básica del proyecto
-```
+📂 Estructura básica del proyecto
+
 Inception/
 ├── 📃 Makefile
 ├── 🔒 secrets/
@@ -204,3 +203,4 @@ Inception/
         └── wordpress/
             ├── Dockerfile
             └── conf/
+
