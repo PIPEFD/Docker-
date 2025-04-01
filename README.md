@@ -1,4 +1,4 @@
-# 🐳 Docker - 📖 Introducción y 🚀 Proyecto Inception
+# 🐳 Docker - Docker Compose 🐋
 
 ## 🐋 ¿Qué es Docker?
 
@@ -30,57 +30,62 @@ Para la instalación oficial y actualizada de Docker en Ubuntu (WSL2), sigue las
 
 ```bash
 sudo apt update
+```
+```bash
 sudo apt upgrade -y
 ```
 
-2. 📅 Instalar dependencias necesarias:
+## 2. 📅 Instalar dependencias necesarias:
 
 ```bash
 sudo apt install -y ca-certificates curl gnupg lsb-release
 ```
 
-3. 🔑 Añadir clave GPG y repositorio oficial de Docker:
+## 3. 🛠️🔑 Añadir clave GPG y repositorio oficial de Docker
 
-```bash
-🛠️ Paso 3 - Añadir clave GPG y repositorio oficial de Docker
-🔒 1. Crear directorio para las claves:
-
-sudo mkdir -p /etc/apt/keyrings
 Esto crea el directorio donde se almacenarán las claves GPG usadas para verificar que los paquetes que vas a instalar son auténticos.
+🔒 1. Crear directorio para las claves:
+```bash
+sudo mkdir -p /etc/apt/keyrings
+```
 
-🔑 2. Descargar y guardar la clave GPG oficial de Docker:
+### 3.1 🔑 Descargar y guardar la clave GPG oficial de Docker:
+
+Este comando descarga la clave de autenticación de Docker y la convierte al formato apropiado (.gpg) para que el sistema pueda usarla.
+```bash
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-Este comando descarga la clave de autenticación de Docker y la convierte al formato apropiado (.gpg) para que el sistema pueda usarla.
+```
 
-📦 3. Añadir el repositorio de Docker a la lista de fuentes APT:
-
+### 3.2 📦 Añadir el repositorio de Docker a la lista de fuentes APT:
+```bash
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
 Este comando añade la fuente oficial de Docker a tu sistema, permitiéndote instalar Docker desde allí.
 
 arch=$(dpkg --print-architecture): detecta si tu sistema es amd64, arm64, etc.
 
-$(lsb_release -cs): obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
-```
 
-🧰📦 Paso 4 - Instalar Docker Engine y herramientas asociadas
+$(lsb_release -cs): obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
+
+## 4. 🧰📦 Instalar Docker Engine y herramientas asociadas
 Primero, actualiza la lista de paquetes, ya que acabamos de añadir un nuevo repositorio:
 
-bash
-Copiar
-Editar
+
+```bash
 sudo apt update
+```
 Luego, instala Docker y sus herramientas oficiales:
 
-bash
-Copiar
-Editar
+
+```bash
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-🧩 ¿Qué estás instalando exactamente?
+````
+### 🧩 ¿Qué estás instalando exactamente?
 
 - docker-ce: Docker Community Edition (el motor principal de Docker).
 - docker-ce-cli: La interfaz de línea de comandos de Docker (docker).
@@ -88,58 +93,58 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 - docker-buildx-plugin: Permite crear imágenes multiplataforma.
 - docker-compose-plugin: Permite usar docker compose (nueva versión integrada del clásico docker-compose).
 
-📌 Importante: según el subject de Inception, no puedes usar imágenes listas de DockerHub (excepto Alpine/Debian). Esto implica que deberás construir tus propias imágenes más adelante, y estos componentes son clave para lograrlo.
+#### 📌 Importante: según el subject de Inception, no puedes usar imágenes listas de DockerHub (excepto Alpine/Debian). Esto implica que deberás construir tus propias imágenes más adelante, y estos componentes son clave para lograrlo.
 
-👤 Paso 5 - Usar Docker como usuario no-root
+# 5. 👤 Usar Docker como usuario no-root
 
-1. Agrega tu usuario al grupo docker:
-   bash
-   Copiar
-   Editar
-   sudo usermod -aG docker \$USER
-   Esto le dice al sistema: “Este usuario tiene permiso para usar Docker sin necesidad de sudo”.
+#### 5.1 Agrega tu usuario al grupo docker:
+  
+  Esto le dice al sistema: “Este usuario tiene permiso para usar Docker sin necesidad de sudo”.
+  ```bash
+  sudo usermod -aG docker \$USER
+  ```
 
-2. Aplica el cambio con este comando:
-   bash
-   Copiar
-   Editar
+#### 5.2 Aplica el cambio con este comando:
+  
+  Esto actualiza tu grupo actual en la sesión actual (sin tener que cerrar sesión).
+  ```bash
    newgrp docker
-   Esto actualiza tu grupo actual en la sesión actual (sin tener que cerrar sesión).
+  ```
 
-✅ Verifica que ya puedes usar Docker sin sudo:
-bash
-Copiar
-Editar
-docker run hello-world
-Este comando ejecutará un contenedor de prueba. Si ves un mensaje que dice algo como:
+#### ✅ Verifica que ya puedes usar Docker sin sudo:
+  Este comando ejecutará un contenedor de prueba. Si ves un mensaje que dice algo como:
+  ```bash
+  docker run hello-world
+  ````
 
-Hello from Docker!
+## Hello from Docker!
 
-️ Paso 6 (Opcional) - Iniciar Docker automáticamente al abrir WSL2
+
+# 6.(Opcional) - Iniciar Docker automáticamente al abrir WSL2
 Por defecto, Docker no arranca solo dentro de WSL2. Si quieres que se inicie automáticamente cada vez que abras tu terminal, puedes automatizarlo con este pequeño truco:
 
-📅 Añadir al .bashrc:
-bash
-Copiar
-Editar
+## 📅 Añadir al .bashrc:
+
+Esto añadirá una línea al final de tu archivo .bashrc, que es ejecutado cada vez que inicias una terminal. El ```bash > /dev/null 2>&1 ``` es para que no muestre mensajes molestos cada vez que abras la terminal.
+```bash
 echo "sudo service docker start > /dev/null 2>&1" >> \~/.bashrc
-Esto añadirá una línea al final de tu archivo .bashrc, que es ejecutado cada vez que inicias una terminal. El > /dev/null 2>&1 es para que no muestre mensajes molestos cada vez que abras la terminal.
+```
 
-🧠 Nota: Esto no es necesario si usas Docker Desktop para WSL2 o si inicias el servicio manualmente con sudo service docker start.
+### 🧠 Nota: Esto no es necesario si usas Docker Desktop para WSL2 o si inicias el servicio manualmente con sudo service docker start.
 
-🔀 Aplica los cambios:
-bash
-Copiar
-Editar
+## 🔀 Aplica los cambios:
+
+
+```bash 
 source \~/.bashrc
-✅ ¡Listo! Si decides no aplicar este paso, puedes simplemente arrancar Docker manualmente cuando lo necesites:
+```
+### ✅ ¡Listo! Si decides no aplicar este paso, puedes simplemente arrancar Docker manualmente cuando lo necesites:
 
-bash
-Copiar
-Editar
+
+```bash
 sudo service docker start
-
-7. ✅ Verificar instalación:
+```
+# 7. ✅ Verificar instalación:
 
 ```bash
 docker run hello-world
