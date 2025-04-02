@@ -14,7 +14,7 @@ docker run
 para levantar tus servicios (como una base de datos, un servidor web y una aplicación), Docker Compose lo hace todo de una sola vez, de forma orquestada.
 
 
-![demo](https://i.gifer.com/A7Hl.gif)
+<img src="https://i.gifer.com/A7Hl.gif" alt="demo" loop autoplay>
 
 ## 🔄 ¿Cómo funciona?
 ### 1. 📄 Archivo docker-compose.yml
