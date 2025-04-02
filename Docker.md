@@ -22,7 +22,7 @@ Para una guía más detallada y oficial sobre Docker, visita la [📖 documentac
 3. Se ejecuta la imagen generada como 📦 **contenedor** usando `docker run`.
 4. Para gestionar múltiples servicios interconectados, se usa 🔧 **Docker Compose**, facilitando el despliegue y comunicación entre contenedores.
 
-## 🛠️ Instalación detallada de Docker en Ubuntu (WSL2) - Versión requerida por el proyecto Inception: Docker Engine estable más reciente compatible con Ubuntu según la documentación oficial
+## 🛠️ Instalación detallada de Docker en Ubuntu (WSL2)- Compatible con Ubuntu según la documentación oficial
 
 Para la instalación oficial y actualizada de Docker en Ubuntu (WSL2), sigue las instrucciones en la [📖 documentación oficial de Docker para Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
 
@@ -43,7 +43,7 @@ sudo apt upgrade -y
 sudo apt install -y ca-certificates curl gnupg lsb-release
 ```
 
-## 3. 🛠️🔑 Añadir clave GPG y repositorio oficial de Docker
+## 3. 🔐 Añadir clave GPG y repositorio oficial de Docker
 
 Esto crea el directorio donde se almacenarán las claves GPG usadas para verificar que los paquetes que vas a instalar son auténticos.
 🔒 1. Crear directorio para las claves:
@@ -74,7 +74,7 @@ arch=$(dpkg --print-architecture): detecta si tu sistema es amd64, arm64, etc.
 
 $(lsb_release -cs): obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
 
-## 4. 🧰📦 Instalar Docker Engine y herramientas asociadas
+## 4. 🧰⚙️ Instalar Docker Engine y herramientas asociadas
 Primero, actualiza la lista de paquetes, ya que acabamos de añadir un nuevo repositorio:
 
 
