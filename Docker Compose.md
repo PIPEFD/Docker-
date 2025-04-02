@@ -24,16 +24,24 @@ Este archivo contiene toda la configuración de tus servicios. Ejemplo:
 version: '3.8'
 
 services:
-  web:
-    image: nginx
+  servicio1:
+    build: ./servicio1
     ports:
-      - "80:80"
-  db:
-    image: mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
+      - "8080:80"
+    networks:
+      - red-compose
+
+  servicio2:
+    image: alpine
+    command: sleep infinity
+    networks:
+      - red-compose
+
+networks:
+  red-compose:
+    driver: bridge
 ```
-Aquí definimos 2 servicios:
+Aquí definimos servicios entre ellos :
 
 #### web: 
 Usa la imagen de nginx y expone el puerto 80.
@@ -91,15 +99,34 @@ Sirve para persistir datos entre reinicios del contenedor (muy importante para W
 #### 🌐 ports
 
 Relaciona puertos del host (tu máquina) con puertos del contenedor. Ejemplo: "443:443" expone HTTPS desde NGINX.
-### Variables de entorno: 
+### Variables de entorno:
+
+## 📁 Uso de variables de entorno con .env
 Puedes usar un archivo .env para centralizar claves y configuraciones.
-### 📁 Uso de variables con .env
+`
+MYSQL_USER=user
+MYSQL_PASSWORD=pass `
+
+Y se usan directamente en el archivo YAML: 
 
 ```yaml
-environment:
-  MYSQL_USER: ${MYSQL_USER}
+services:
+  db:
+    image: mariadb
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 ```
-Eso hace que MYSQL_USER se cargue automáticamente desde el archivo .env. ¡Mucho más limpio y seguro!
+## 🧩 Buenas prácticas
+
+- Utiliza redes personalizadas para separar entornos.
+
+- Gestiona datos persistentes con volúmenes explícitos.
+
+- Usa variables de entorno para secretos, nunca hardcodeados.
+
+- Divide servicios en contenedores específicos para mantener aislamiento y seguridad.
+Eso hace que `MYSQL_USER` se cargue automáticamente desde el archivo .env. ¡Mucho más limpio y seguro!
 
 ## 🧠 ¿Qué pasa cuando haces docker-compose up?
 - Lee el `docker-compose.yml`
