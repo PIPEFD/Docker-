@@ -2,6 +2,7 @@
 
 Para una guía más detallada y oficial sobre Docker Compose, visita la [📖 documentación oficial de Docker Compose](https://docs.docker.com/compose/).
 
+La especificación Compose establece un estándar para la definición de aplicaciones multicontenedor independientes de la plataforma. [Puede consultar la especificación](https://github.com/compose-spec/compose-spec/blob/main/00-overview.md)
 ## 🔧 ¿Qué es Docker Compose?
 Docker Compose es una herramienta oficial de Docker que permite definir, configurar y ejecutar múltiples contenedores a la vez usando un solo archivo YAML ```bash (docker-compose.yml)```
 
@@ -35,12 +36,12 @@ services:
 Aquí definimos 2 servicios:
 
 #### web: 
-Que usa la imagen de nginx y expone el puerto 80.
+Usa la imagen de nginx y expone el puerto 80.
 
 #### db: 
-Que usa la imagen de mariadb y define una contraseña por variable de entorno.
+Usa la imagen de mariadb y define una contraseña por variable de entorno.
 
-## 2. 🛠️ Comandos principales
+## 2. 🛠️✅ Comandos útiles
 Levanta todos los contenedores definidos.
 ```Dockerfile
 docker-compose up: 
@@ -66,17 +67,52 @@ docker-compose up -d
 Levanta todo en segundo plano (-d = detached).
 
 # ¿Qué incluye Docker Compose?
-### Servicios:
-Cada contenedor que usas (nginx, wordpress, mariadb…).
+#### 🧩 services
+Cada servicio representa un contenedor. En este ejemplo hay 3:
 
-### Redes: 
-Se crean automáticamente, para que los servicios puedan comunicarse entre sí.
+- nginx
 
-### Volúmenes: 
-Para que los datos persistan aunque reinicies el contenedor.
+- wordpress
 
+- mariadb
+
+#### 🏗️ build
+
+Indica la ruta donde está el Dockerfile de ese servicio.
+
+#### 🌍 networks
+
+Define una red virtual privada donde los contenedores se comunican entre sí (sin exponer servicios al exterior si no quieres).
+
+#### 💾 volumes
+
+Sirve para persistir datos entre reinicios del contenedor (muy importante para WordPress y bases de datos como MariaDB).
+
+#### 🌐 ports
+
+Relaciona puertos del host (tu máquina) con puertos del contenedor. Ejemplo: "443:443" expone HTTPS desde NGINX.
 ### Variables de entorno: 
 Puedes usar un archivo .env para centralizar claves y configuraciones.
+### 📁 Uso de variables con .env
+
+```yaml
+environment:
+  MYSQL_USER: ${MYSQL_USER}
+```
+Eso hace que MYSQL_USER se cargue automáticamente desde el archivo .env. ¡Mucho más limpio y seguro!
+
+## 🧠 ¿Qué pasa cuando haces docker-compose up?
+- Lee el `docker-compose.yml`
+
+- Construye las imágenes si es necesario (build)
+
+- Crea y levanta los contenedores
+
+- Crea la red definida
+
+- Monta los volúmenes persistentes
+
+#### todo esto con un solo comando 🤯
 
 # 🔁 Flujo de trabajo típico con Docker Compose
 #### Creas tu estructura de carpetas y docker-compose.yml.
@@ -86,6 +122,23 @@ Puedes usar un archivo .env para centralizar claves y configuraciones.
 #### Usas docker-compose up para levantar todo el entorno.
 
 #### Puedes hacer docker-compose down para limpiarlo o reiniciarlo.
+
+### 📦 ¿Dónde se guarda todo?
+Imágenes: en tu sistema Docker (docker images)
+
+- #### Contenedores: 
+```bash 
+docker ps -a
+```
+
+- #### Volúmenes: 
+```bash 
+docker volume ls
+```
+- #### Redes: `
+```bash 
+docker network ls
+```
 
 # 🧠 Ventajas
 ✅ Fácil de usar
