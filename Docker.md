@@ -69,10 +69,14 @@ echo \
 ```
 Este comando añade la fuente oficial de Docker a tu sistema, permitiéndote instalar Docker desde allí.
 
-arch=$(dpkg --print-architecture): detecta si tu sistema es amd64, arm64, etc.
+arch=$(dpkg --print-architecture): 
+
+detecta si tu sistema es amd64, arm64, etc.
 
 
-$(lsb_release -cs): obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
+$(lsb_release -cs): 
+
+obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
 
 ## 4. 🧰⚙️ Instalar Docker Engine y herramientas asociadas
 Primero, actualiza la lista de paquetes, ya que acabamos de añadir un nuevo repositorio:
