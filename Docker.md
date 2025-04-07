@@ -1,6 +1,7 @@
 # 🐳 Docker (CLI básico) 🐋
 
-<img src="https://i.gifer.com/F3Cr.gif" alt="demo" loop autoplay>
+<!-- <img src="https://i.gifer.com/F3Cr.gif" alt="demo" loop autoplay> -->
+![Docker GIF](./assets/estibador.gif)
 
 ## 🐋 ¿Qué es Docker?
 
