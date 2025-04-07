@@ -51,6 +51,17 @@ Inception/
             ├── Dockerfile
             └── conf/
 ```
+## 🛠️ Crear y definir un Makefile inicial para automatizar procesos básicos:
+
+-build
+
+-up
+
+-down
+
+-clean
+
+-fclean
 
 ## 🐳 Docker (solo CLI) vs Docker Compose
 

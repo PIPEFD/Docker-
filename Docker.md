@@ -71,12 +71,12 @@ Este comando añade la fuente oficial de Docker a tu sistema, permitiéndote ins
 
 arch=$(dpkg --print-architecture): 
 
-detecta si tu sistema es amd64, arm64, etc.
+Detecta si tu sistema es amd64, arm64, etc.
 
 
 $(lsb_release -cs): 
 
-obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
+Obtiene el nombre clave de tu distribución de Ubuntu (como jammy, focal, etc).
 
 ## 4. 🧰⚙️ Instalar Docker Engine y herramientas asociadas
 Primero, actualiza la lista de paquetes, ya que acabamos de añadir un nuevo repositorio:
@@ -155,3 +155,16 @@ sudo service docker start
 ```bash
 docker run hello-world
 ```
+
+## 🐳 Docker (solo CLI) vs Docker Compose
+
+
+| Característica                          | Docker CLI (manual)                          | Docker Compose (automático con YAML)          |
+|----------------------------------------|----------------------------------------------|-----------------------------------------------|
+| Definición de servicios                | Manual, uno por uno con `docker run`         | Declarativa, con YAML (`docker-compose.yml`)  |
+| Orquestación de múltiples contenedores | Difícil, poco práctico                        | Súper fácil, un solo comando                  |
+| Reutilización                          | Manual, se repite cada comando               | Automático, reproducible                      |
+| Variables de entorno                   | A mano con `-e`                              | Centralizadas con `.env`                     |
+| Redes y volúmenes                      | Se crean manualmente                         | Se declaran y gestionan automáticamente       |
+| Mantenimiento                          | Difícil, poco escalable                      | Sencillo y limpio                             |
+| Ideal para…                            | Contenedores sueltos, pruebas rápidas        | Proyectos con múltiples servicios             |
