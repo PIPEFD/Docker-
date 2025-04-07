@@ -1,5 +1,7 @@
 # 🐳 Docker (CLI básico) 🐋
 
+<img src="https://i.gifer.com/F3Cr.gif" alt="demo" loop autoplay>
+
 ## 🐋 ¿Qué es Docker?
 
 Docker es una 🚢 plataforma que permite desarrollar, enviar y ejecutar 📦 aplicaciones mediante contenedores ligeros y portátiles. Estos contenedores incluyen todo lo necesario para ejecutar la aplicación, como 💻 código, 📚 dependencias, 📖 bibliotecas y ⚙️ configuraciones específicas, asegurando que funcionen consistentemente en diferentes 🌍 entornos.
