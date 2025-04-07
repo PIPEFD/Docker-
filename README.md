@@ -3,9 +3,8 @@
 
 ¡Bienvenido! Este repositorio está diseñado para ayudarte a comprender y trabajar con las tecnologías esenciales del ecosistema **Docker**.
 
-<img src="https://i.gifer.com/3Myg.gif"  loop autoplay>
-<img src="https://i.gifer.com/3Myg.gif" width="500"/>
-![Docker GIF](https://i.gifer.com/3Myg.gif)
+![Docker GIF](https://i.imgur.com/ZKON2Kz.gif)
+
 
 
 
