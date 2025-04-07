@@ -156,15 +156,3 @@ sudo service docker start
 docker run hello-world
 ```
 
-## 🐳 Docker (solo CLI) vs Docker Compose
-
-
-| Característica                          | Docker CLI (manual)                          | Docker Compose (automático con YAML)          |
-|----------------------------------------|----------------------------------------------|-----------------------------------------------|
-| Definición de servicios                | Manual, uno por uno con `docker run`         | Declarativa, con YAML (`docker-compose.yml`)  |
-| Orquestación de múltiples contenedores | Difícil, poco práctico                        | Súper fácil, un solo comando                  |
-| Reutilización                          | Manual, se repite cada comando               | Automático, reproducible                      |
-| Variables de entorno                   | A mano con `-e`                              | Centralizadas con `.env`                     |
-| Redes y volúmenes                      | Se crean manualmente                         | Se declaran y gestionan automáticamente       |
-| Mantenimiento                          | Difícil, poco escalable                      | Sencillo y limpio                             |
-| Ideal para…                            | Contenedores sueltos, pruebas rápidas        | Proyectos con múltiples servicios             |
