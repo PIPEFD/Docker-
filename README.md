@@ -3,7 +3,7 @@
 
 ¡Bienvenido! Este repositorio está diseñado para ayudarte a comprender y trabajar con las tecnologías esenciales del ecosistema **Docker**.
 
-![](https://i.gifer.com/F3Cr.gif)
+<img src="https://i.gifer.com/3Myg.gif" alt="demo" loop autoplay>
 
 
 Aquí encontrarás una serie de guías prácticas que explican paso a paso los fundamentos de Docker, su motor principal, la herramienta Docker Compose y la estructura de Inception.
