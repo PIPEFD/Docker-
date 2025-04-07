@@ -5,6 +5,8 @@
 
 <img src="https://i.gifer.com/3Myg.gif"  loop autoplay>
 <img src="https://i.gifer.com/3Myg.gif" width="500"/>
+![Docker GIF](https://i.gifer.com/3Myg.gif)
+
 
 
 Aquí encontrarás una serie de guías prácticas que explican paso a paso los fundamentos de Docker, su motor principal, la herramienta Docker Compose y la estructura de Inception.
