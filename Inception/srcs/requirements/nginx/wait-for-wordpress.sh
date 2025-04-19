@@ -5,20 +5,20 @@ PORT=${2:-9000}
 RETRIES=30
 SLEEP_TIME=2
 
-echo "🔄 Esperando a que WordPress esté disponible en $HOST:$PORT..."
+echo "🔄 Esperando a que WordPress (php-fpm) esté disponible en $HOST:$PORT..."
 
 for i in $(seq 1 $RETRIES); do
     if nc -z "$HOST" "$PORT"; then
-        echo "✅ WordPress disponible en intento $i"
+        echo "✅ WordPress disponible en el intento $i"
         break
     fi
-    echo "❌ WordPress no disponible aún (intento $i/$RETRIES). Esperando $SLEEP_TIME segundos..."
+    echo "❌ WordPress aún no responde (intento $i/$RETRIES). Esperando $SLEEP_TIME segundos..."
     sleep $SLEEP_TIME
 done
 
 if ! nc -z "$HOST" "$PORT"; then
-    echo "⛔ WordPress no está disponible después de $RETRIES intentos. Arrancando Nginx igualmente."
+    echo "⛔ WordPress no está disponible después de $RETRIES intentos. Lanzando nginx de todas formas."
 fi
 
-echo "🚀 Lanzando Nginx..."
+echo "🚀 Iniciando Nginx..."
 exec nginx -g "daemon off;"

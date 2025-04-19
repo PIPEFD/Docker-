@@ -1,28 +1,25 @@
 services:
+
   mariadb:
-    build:
-      context: ./requirements/mariadb
-    container_name: mariadb
+    image: mariadb:10.5
     restart: always
     secrets:
       - db_password
       - db_root_password
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD_FILE: /run/secrets/db_password
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
     volumes:
+      - ./requirements/mariadb/conf/init.sh:/docker-entrypoint-initdb.d/init.sh
       - mariadb-data:/var/lib/mysql
+      - ./requirements/mariadb/conf/my.cnf:/etc/mysql/mariadb.conf.d/99-custom.cnf:ro
     networks:
       - inception_network
-
 
   wordpress:
     build: ./requirements/wordpress
-    # container_name: wordpress
-    networks:
-      - inception_network
     restart: always
     depends_on:
       - mariadb
@@ -32,27 +29,35 @@ services:
     environment:
       WORDPRESS_DB_HOST: mariadb:3306
       WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
     volumes:
       - wordpress-data:/var/www/html
-
+      - ./requirements/wordpress/conf:/docker-entrypoint-initwp.d
+    expose:
+      - "9000"
+    networks:
+      - inception_network
 
   nginx:
     build:
       context: ./requirements/nginx
-      dockerfile: Dockerfile
-    container_name: inception_nginx
+    restart: always
     depends_on:
       - wordpress
     ports:
       - "443:443"
-    entrypoint: ["/bin/sh", "-c", "/wait-for-wordpress.sh wordpress 9000 && nginx -g 'daemon off;'"]
+      - "80:80"
     volumes:
       - wordpress-data:/var/www/html
       - ./requirements/nginx/wait-for-wordpress.sh:/wait-for-wordpress.sh
+    entrypoint: ["/bin/sh", "-c", "/wait-for-wordpress.sh wordpress 9000 && nginx -g 'daemon off;'"]
     networks:
       - inception_network
+
+# ======================
+#    SECRETS & VOLUMES
+# ======================
 
 secrets:
   db_password:
