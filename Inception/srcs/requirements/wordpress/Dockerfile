@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Dockerfile                                         :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: dbonilla <dbonilla@student.42urduliz.co    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/04/20 19:13:25 by dbonilla          #+#    #+#              #
+#    Updated: 2025/04/20 19:13:26 by dbonilla         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 FROM wordpress:php8.2-fpm
 
 # Instalar utilidades de depuración y cliente MySQL

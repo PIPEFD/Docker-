@@ -110,5 +110,5 @@ Este documento describe las reglas disponibles en el Makefile del proyecto Incep
 
 ---
 
-> 🧠 *Este Makefile fue diseñado para cumplir con los estándares del proyecto Inception en 42 y sigue buenas prácticas de administración de contenedores Docker.*
+> 🧠 *Este Makefile fue diseñado para cumplir con los estándares del proyecto, sigue buenas prácticas de administración de contenedores Docker.*
 
