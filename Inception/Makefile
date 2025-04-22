@@ -2,7 +2,7 @@
 #        VARIABLES
 # ========================
 
-COMPOSE    = docker compose -f ./srcs/docker-compose.yml --env-file ./srcs/.env
+COMPOSE    = docker compose -f ./docker-compose.yml --env-file .env
 
 # Colores
 DEF_COLOR  = \033[0;39m
@@ -23,11 +23,6 @@ LOG_DIR := logs/logs-$(TIMESTAMP)
 #         BUILD
 # ========================
 
-all: check_ports check build up
-
-build: build-wordpress build-mariadb build-nginx
-	@echo "$(GREEN)✅ Build completo de todos los servicios.$(CLEAR)"
-
 build-wordpress:
 	@echo "$(BLUE)🔧 Construyendo WordPress...$(CLEAR)"
 	@$(COMPOSE) build wordpress
@@ -40,11 +35,14 @@ build-nginx:
 	@echo "$(BLUE)🔧 Construyendo Nginx...$(CLEAR)"
 	@$(COMPOSE) build nginx
 
+build: build-wordpress build-mariadb build-nginx
+	@echo "$(GREEN)✅ Build completo de todos los servicios.$(CLEAR)"
+
 rebuild:
 	@echo "$(MAGENTA)♻️ Reconstrucción completa...$(CLEAR)"
-	@$(COMPOSE) down --volumes --remove-orphans
+	@$(MAKE) down clean-data
 	@$(COMPOSE) build --no-cache
-	@$(COMPOSE) up -d --force-recreate
+	@$(MAKE) up
 
 # ========================
 #         RESET
@@ -52,16 +50,12 @@ rebuild:
 
 reset-wp:
 	@$(COMPOSE) stop wordpress || true
-	@docker volume rm srcs_wordpress-data 2>/dev/null || true
-	@docker rm -f $$(docker ps -aqf "name=wordpress") 2>/dev/null || true
-	@$(COMPOSE) build wordpress
+	@sudo rm -rf ./data/wordpress/*
 	@$(COMPOSE) up -d wordpress
 
 reset-db:
 	@$(COMPOSE) stop mariadb || true
-	@docker volume rm srcs_mariadb-data 2>/dev/null || true
-	@docker rm -f $$(docker ps -aqf "name=mariadb") 2>/dev/null || true
-	@$(COMPOSE) build mariadb
+	@sudo rm -rf ./data/mariadb/*
 	@$(COMPOSE) up -d mariadb
 
 reset-nginx:
@@ -71,10 +65,40 @@ reset-nginx:
 	@$(COMPOSE) up -d nginx
 
 reset-all:
-	@$(COMPOSE) down -v --remove-orphans
-	@docker volume prune -f
-	@$(COMPOSE) build
-	@$(COMPOSE) up -d
+	@$(MAKE) down clean-data build up
+
+# ========================
+#         SETUP
+# ========================
+
+generate-ssl:
+	@echo "$(CYAN)🔐 Generando certificado SSL autofirmado...$(CLEAR)"
+	@mkdir -p ./requirements/nginx/conf/ssl
+	@if [ ! -f ./requirements/nginx/conf/ssl/nginx.key ] || [ ! -f ./requirements/nginx/conf/ssl/nginx.crt ]; then \
+		DOMAIN=$$(grep DOMAIN_NAME .env | cut -d '=' -f2); \
+		openssl req -x509 -nodes -days 365 \
+		-newkey rsa:2048 \
+		-keyout ./requirements/nginx/conf/ssl/nginx.key \
+		-out ./requirements/nginx/conf/ssl/nginx.crt \
+		-subj "/C=ES/ST=42/L=Inception/O=42/OU=Student/CN=$$DOMAIN"; \
+		echo "$(GREEN)✅ Certificado SSL generado correctamente.$(CLEAR)"; \
+	else \
+		echo "$(YELLOW)⚠️  Certificado ya existe, omitiendo generación.$(CLEAR)"; \
+	fi
+
+configure-hosts:
+	@echo "$(CYAN)📝 Añadiendo dominio personalizado al /etc/hosts (requiere sudo)...$(CLEAR)"
+	@DOMAIN=$$(grep DOMAIN_NAME .env | cut -d '=' -f2); \
+	if ! grep -q "$$DOMAIN" /etc/hosts; then \
+		echo "127.0.0.1 $$DOMAIN" | sudo tee -a /etc/hosts > /dev/null && \
+		echo "$(GREEN)✅ Dominio $$DOMAIN añadido a /etc/hosts.$(CLEAR)"; \
+	else \
+		echo "$(YELLOW)⚠️  Dominio $$DOMAIN ya existe en /etc/hosts.$(CLEAR)"; \
+	fi
+
+setup: generate-ssl
+	@echo "$(CYAN)⚙️  Ejecutando setup inicial...$(CLEAR)"
+	@bash ./scripts/setup.sh
 
 # ========================
 #         CHECK
@@ -87,8 +111,10 @@ check_ports:
 		echo "$(RED)❌ Puerto 443 en uso.$(CLEAR)"; exit 1; fi
 	@echo "$(GREEN)✅ Puertos libres.$(CLEAR)"
 
-check:
+check-secrets:
 	@bash ./scripts/check_secrets.sh
+
+check-env:
 	@bash ./scripts/check_env.sh
 
 verify-secrets:
@@ -105,26 +131,21 @@ check-firewall:
 
 check-env-vars:
 	@echo "$(CYAN)🔢 Comprobando variables de entorno cargadas desde .env...$(CLEAR)"
-	@cat ./srcs/.env | grep -v '^#' | grep '=' || echo "$(YELLOW)⚠️ No hay variables definidas en .env$(CLEAR)"
-
-bash-wordpress:
-	@docker exec -it $$(docker ps -qf "name=wordpress") bash
-
-bash-mariadb:
-	@docker exec -it $$(docker ps -qf "name=mariadb") bash
-
-bash-nginx:
-	@docker exec -it $$(docker ps -qf "name=nginx") bash
+	@cat .env | grep -v '^#' | grep '=' || echo "$(YELLOW)⚠️ No hay variables definidas en .env$(CLEAR)"
 
 check-nginx-response:
 	@echo "$(MAGENTA)🔍 Verificando respuesta de Nginx sobre HTTPS...$(CLEAR)"
-	@curl -vk --resolve localhost:443:127.0.0.1 https://localhost/index.php || echo "$(RED)❌ Fallo al contactar con Nginx$(CLEAR)"
+	@DOMAIN=$$(grep DOMAIN_NAME .env | cut -d '=' -f2); \
+	curl -vk --resolve $$DOMAIN:443:127.0.0.1 https://$$DOMAIN/index.php || echo "$(RED)❌ Fallo al contactar con Nginx en $$DOMAIN$(CLEAR)"
 
 check-ssl-cert:
 	@echo "$(MAGENTA)📄 Verificando certificado SSL de Nginx...$(CLEAR)"
-	@test -f ./srcs/requirements/nginx/conf/ssl/nginx.crt && echo "$(GREEN)✅ Certificado SSL presente.$(CLEAR)" || echo "$(RED)❌ Certificado SSL no encontrado.$(CLEAR)"
-	@test -f ./srcs/requirements/nginx/conf/ssl/nginx.key && echo "$(GREEN)✅ Llave SSL presente.$(CLEAR)" || echo "$(RED)❌ Llave SSL no encontrada.$(CLEAR)"
+	@test -f ./requirements/nginx/conf/ssl/nginx.crt && echo "$(GREEN)✅ Certificado SSL presente.$(CLEAR)" || echo "$(RED)❌ Certificado SSL no encontrado.$(CLEAR)"
+	@test -f ./requirements/nginx/conf/ssl/nginx.key && echo "$(GREEN)✅ Llave SSL presente.$(CLEAR)" || echo "$(RED)❌ Llave SSL no encontrada.$(CLEAR)"
 	@docker exec -it $$(docker ps -qf "name=nginx") test -f /etc/nginx/ssl/nginx.crt && echo "$(GREEN)✅ Certificado presente dentro del contenedor.$(CLEAR)" || echo "$(RED)❌ Certificado no encontrado en el contenedor.$(CLEAR)"
+
+check: check_ports check-secrets check-env check-firewall check-env-vars check-nginx-response check-ssl-cert
+	@echo "$(GREEN)✅ Todas las comprobaciones han pasado.$(CLEAR)"
 
 # ========================
 #         STATUS
@@ -134,7 +155,7 @@ up:
 	@$(COMPOSE) up -d
 
 down:
-	@$(COMPOSE) down
+	@$(COMPOSE) down --remove-orphans
 
 logs:
 	@$(COMPOSE) logs -f
@@ -145,36 +166,54 @@ status:
 	@docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$(docker ps -q)
 
 # ========================
-#         DEBUG
+#         BASH
 # ========================
 
-debug:
-	@$(MAKE) healthcheck
-	@$(MAKE) status
 
+bash-wordpress:
+	@docker exec -it $$(docker ps -qf "name=wordpress") bash
+
+bash-mariadb:
+	@docker exec -it $$(docker ps -qf "name=mariadb") bash
+
+bash-nginx:
+	@docker exec -it $$(docker ps -qf "name=nginx") bash
+
+# ========================
+#         DEBUG
+# ========================
 healthcheck:
-	@docker exec -i $$(docker ps -qf "name=mariadb") mysqladmin ping -u root -p"$$(cat ./secrets/db_root_password.txt)" > /dev/null 2>&1 && echo "✅ MariaDB activo" || echo "❌ MariaDB no responde"
-	@docker exec -i $$(docker ps -qf "name=wordpress") nc -z localhost 9000 > /dev/null 2>&1 && echo "✅ WordPress (php-fpm) activo" || echo "❌ WordPress no responde"
-	@curl -sk https://localhost | grep -q "html" && echo "✅ Nginx sirviendo contenido" || echo "❌ Nginx no responde"
+	@bash ./scripts/healthcheck.sh
+
+debug: healthcheck status
+
+diagnose:
+	@bash ./scripts/diagnostics.sh
 
 # ========================
 #         UTILS
 # ========================
 
+clean-data:
+	@echo "$(RED)🧹 Eliminando datos persistentes...$(CLEAR)"
+	@sudo rm -rf ./data/mariadb/* ./data/wordpress/*
+	@sudo rm -rf ./requirements/nginx/conf/ssl/*
+purge-data:
+	@echo "$(RED)🗑️ Borrando completamente la carpeta de datos persistentes...$(CLEAR)"
+	@sudo rm -rf ./data
+
 clean:
 	@$(COMPOSE) down -v --remove-orphans
 
-fclean: clean
-	@docker system prune -af
-	@docker volume prune -f
+fclean: clean clean-data
+	@bash ./scripts/clean_docker.sh all
 
-monitor:
+monitor: healthcheck
 	@echo "$(MAGENTA)🔍 MONITOREO COMPLETO$(CLEAR)"
-	@$(MAKE) healthcheck
 	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 	@docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$(docker ps -q)
-	@openssl x509 -in ./srcs/requirements/nginx/conf/ssl/nginx.crt -noout -dates 2>/dev/null || echo "❌ Certificado no encontrado."
-	@test -f ./srcs/requirements/nginx/conf/ssl/nginx.crt && echo "✅ Certificado SSL generado en contenedor Nginx." || echo "❌ Certificado SSL no generado."
+	@openssl x509 -in ./requirements/nginx/conf/ssl/nginx.crt -noout -dates 2>/dev/null || echo "❌ Certificado no encontrado."
+	@test -f ./requirements/nginx/conf/ssl/nginx.crt && echo "✅ Certificado SSL generado en contenedor Nginx." || echo "❌ Certificado SSL no generado."
 	@docker exec -it $$(docker ps -qf "name=nginx") test -f /etc/nginx/ssl/nginx.crt && echo "✅ Certificado SSL presente dentro del contenedor." || echo "❌ Certificado SSL no presente en el contenedor."
 	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 	@docker logs --tail=10 $$(docker ps -qf "name=wordpress") || echo "⚠️ WordPress no disponible"
@@ -183,7 +222,7 @@ monitor:
 	@$(MAKE) check-ssl-cert
 
 print-config:
-	@cat ./srcs/.env | grep -v '^#' | grep '='
+	@cat .env | grep -v '^#' | grep '='
 
 volume-size:
 	@docker system df -v | grep 'srcs_'
@@ -207,14 +246,49 @@ save-logs:
 	done
 	@echo "$(GREEN)✅ Todos los logs fueron guardados en '$(LOG_DIR)'$(CLEAR)"
 
-run:
+run: build up save-logs
 	@echo "$(MAGENTA)🚀 Ejecutando build + up + save-logs...$(CLEAR)"
-	@$(MAKE) build
-	@$(MAKE) up
-	@$(MAKE) save-logs
 
-# ========================
-#       PHONY TARGETS
-# ========================
+all: setup check build up
 
-.PHONY: all build rebuild build-wordpress build-mariadb build-nginx reset-wp reset-db reset-nginx reset-all check check_ports check_env verify-secrets check-firewall check-env-vars bash-wordpress bash-mariadb bash-nginx check-nginx-response check-ssl-cert up down logs status debug healthcheck clean fclean monitor print-config volume-size save-logs run
+.PHONY: all \
+		setup \
+		generate-ssl \
+		configure-hosts \
+		build \
+		build-wordpress \
+		build-mariadb \
+		build-nginx \
+		rebuild \
+		reset-wp \
+		reset-db \
+		reset-nginx \
+		reset-all \
+		check \
+		check_ports \
+		check-secrets \
+		check-env \
+		verify-secrets \
+		check-firewall \
+		check-env-vars \
+		check-nginx-response \
+		check-ssl-cert \
+		up \
+		down \
+		logs \
+		status \
+		debug \
+		healthcheck \
+		diagnose \
+		clean-data \
+		purge-data \
+		clean \
+		fclean \
+		monitor \
+		print-config \
+		volume-size \
+		save-logs \
+		run \
+		bash-wordpress \
+		bash-mariadb \
+		bash-nginx \
