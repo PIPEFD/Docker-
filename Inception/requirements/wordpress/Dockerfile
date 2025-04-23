@@ -25,8 +25,11 @@ COPY ./conf/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./conf/install-wp.sh /docker-entrypoint-initwp.d/install-wp.sh
 
 # Permisos
+# Permisos
 RUN chmod +x /docker-entrypoint-initwp.d/install-wp.sh
 
-EXPOSE 9000
+# Nuevo entrypoint
+COPY conf/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/bin/sh", "-c", "for f in /docker-entrypoint-initwp.d/*.sh; do echo \"🚀 Ejecutando $f\"; bash $f; done && exec php-fpm"]
+ENTRYPOINT ["/entrypoint.sh"]

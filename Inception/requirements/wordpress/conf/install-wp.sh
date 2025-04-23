@@ -1,40 +1,47 @@
 #!/bin/bash
-set -eu
+set -e
 
-echo "📦 Iniciando instalación automática de WordPress..."
+echo "📦 Iniciando instalación de WordPress..."
 
-# Leer variables desde el archivo de secrets
+# === 1. Leer secretos ===
+DB_PASSWORD_FILE="/run/secrets/db_password"
 CREDENTIALS_FILE="/run/secrets/credentials"
+
+if [ ! -f "$DB_PASSWORD_FILE" ]; then
+  echo "⛔ Secreto db_password no encontrado."
+  exit 1
+fi
+
+DB_PASSWORD=$(cat "$DB_PASSWORD_FILE")
+
+if [ ! -f "$CREDENTIALS_FILE" ]; then
+  echo "⛔ Secreto credentials no encontrado."
+  exit 1
+fi
+
+# === 2. Exportar variables del archivo credentials ===
 while IFS='=' read -r key value; do
-  export "$key"="$value"
-  echo "✅ Variable exportada: $key=$value"
+  if [[ -n "$key" && -n "$value" ]]; then
+    export "$key"="$value"
+  fi
 done < "$CREDENTIALS_FILE"
 
-# Esperar a que la base de datos esté lista
-until wp --allow-root --path=/var/www/html db check >/dev/null 2>&1; do
-  echo "⏳ Esperando a que MariaDB esté disponible..."
-  sleep 2
-done
+if [ -z "$WP_ADMIN_EMAIL" ]; then
+  echo "⛔ El campo WP_ADMIN_EMAIL está vacío. Verifica tu archivo de secretos."
+  exit 1
+fi
 
-# Instalar WordPress solo si no está instalado
-if wp --allow-root --path=/var/www/html core is-installed; then
-  echo "✅ WordPress ya está instalado."
-else
-  if [ ! -f /var/www/html/index.php ]; then
-    echo "📥 Descargando WordPress..."
-    wp core download --allow-root --path=/var/www/html
-  fi
+echo "🔐 Variables cargadas:"
+echo "  DB_NAME=$WORDPRESS_DB_NAME"
+echo "  DB_USER=$WORDPRESS_DB_USER"
+echo "  DB_HOST=$WORDPRESS_DB_HOST"
+echo "  DOMAIN=$DOMAIN_NAME"
+echo "  ADMIN_USER=$WP_ADMIN_USER"
+echo "  ADMIN_EMAIL=$WP_ADMIN_EMAIL"
 
-  echo "⚙️ Generando wp-config.php con WP-CLI..."
-  wp config create \
-    --dbname="$DB_NAME" \
-    --dbuser="$DB_USER" \
-    --dbpass="$DB_PASSWORD" \
-    --dbhost="$DB_HOST" \
-    --path=/var/www/html \
-    --allow-root
-
-  echo "🚀 Ejecutando instalación de WordPress..."
+# === 3. Instalar WordPress si no está ===
+if ! wp core is-installed --allow-root --path=/var/www/html; then
+  echo "🚀 Instalando WordPress..."
   wp core install \
     --url="https://${DOMAIN_NAME}" \
     --title="Inception WP" \
@@ -43,9 +50,10 @@ else
     --admin_email="$WP_ADMIN_EMAIL" \
     --path=/var/www/html \
     --skip-email \
-    --allow-root
-
-  echo "✅ WordPress instalado correctamente."
+    --allow-root || {
+      echo "❌ Fallo en la instalación de WordPress.";
+      exit 1;
+    }
+else
+  echo "✅ WordPress ya estaba instalado."
 fi
-
-exec php-fpm
