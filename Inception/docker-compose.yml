@@ -1,8 +1,8 @@
 
 services:
   mariadb:
-    build: ./requirements/mariadb
-    image: inception-mariadb:10.5
+    build: ./srcs/requirements/mariadb
+    image: mariadb
     restart: unless-stopped
     secrets:
       - db_password
@@ -14,9 +14,9 @@ services:
       MYSQL_USER: wp_user
       MYSQL_PASSWORD_FILE: /run/secrets/db_password
     volumes:
-      - ./requirements/mariadb/conf:/docker-entrypoint-initdb.d
+      - ./srcs/requirements/mariadb/conf:/docker-entrypoint-initdb.d
       - ./data/mariadb:/var/lib/mysql
-      - ./requirements/mariadb/conf/my.cnf:/etc/mysql/mariadb.conf.d/99-custom.cnf:ro
+      - ./srcs/requirements/mariadb/conf/my.cnf:/etc/mysql/mariadb.conf.d/99-custom.cnf:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -26,8 +26,8 @@ services:
       - inception_network
 
   wordpress:
-    build: ./requirements/wordpress
-    image: inception-wordpress:php8.2-fpm
+    build: ./srcs/requirements/wordpress
+    image: wordpress
     restart: unless-stopped
     depends_on:
       mariadb:
@@ -44,11 +44,11 @@ services:
       CREDENTIALS_FILE: /run/secrets/credentials
     volumes:
       - ./data/wordpress:/var/www/html
-      - ./requirements/wordpress/conf:/docker-entrypoint-initwp.d
+      - ./srcs/requirements/wordpress/conf:/docker-entrypoint-initwp.d
     expose:
       - "9000"
     healthcheck:
-        test: ["CMD", "php-fpm", "-tt"]
+        test: ["CMD", "php-fpm7.4", "-t"]
         interval: 10s
         timeout: 5s
         retries: 5
@@ -56,21 +56,20 @@ services:
       - inception_network
 
   nginx:
-    build: ./requirements/nginx
-    image: inception-nginx:latest
+    build: ./srcs/requirements/nginx
+    image: nginx
     restart: unless-stopped
     depends_on:
       wordpress:
         condition: service_healthy
     ports:
       - "443:443"
-      - "80:80"
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME:-dbonilla.42.fr}
     volumes:
       - ./data/wordpress:/var/www/html:ro
-      - ./requirements/nginx/conf/wait-for-wordpress.sh:/wait-for-wordpress.sh:ro
-      - ./requirements/nginx/conf/ssl:/etc/nginx/ssl:ro
+      - ./srcs/requirements/nginx/conf/wait-for-wordpress.sh:/wait-for-wordpress.sh:ro
+      - ./srcs/requirements/nginx/conf/ssl:/etc/nginx/ssl:ro
     entrypoint: ["/bin/sh", "-c", "/wait-for-wordpress.sh wordpress 9000 && nginx -g 'daemon off;'"]
     networks:
       - inception_network

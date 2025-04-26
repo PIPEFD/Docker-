@@ -39,7 +39,7 @@ echo "  DOMAIN=$DOMAIN_NAME"
 echo "  ADMIN_USER=$WP_ADMIN_USER"
 echo "  ADMIN_EMAIL=$WP_ADMIN_EMAIL"
 
-# === 3. Instalar WordPress si no está ===
+# === 3. Instalar WordPress si no está instalado ===
 if ! wp core is-installed --allow-root --path=/var/www/html; then
   echo "🚀 Instalando WordPress..."
   wp core install \
