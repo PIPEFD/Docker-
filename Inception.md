@@ -40,7 +40,7 @@ Inception/
 └── 📁 srcs/
     ├── docker-compose.yml
     ├── .env
-    └── 📂 requirements/
+    └── 📂 srcs/
         ├── mariadb/
         │   ├── Dockerfile
         │   └── conf/
