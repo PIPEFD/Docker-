@@ -68,9 +68,9 @@ services:
       DOMAIN_NAME: ${DOMAIN_NAME:-dbonilla.42.fr}
     volumes:
       - ./data/wordpress:/var/www/html:ro
-      - ./srcs/requirements/nginx/conf/wait-for-wordpress.sh:/wait-for-wordpress.sh:ro
+      - ./srcs/requirements/nginx/conf/entrypoint.sh:/entrypoint.sh:ro
       - ./srcs/requirements/nginx/conf/ssl:/etc/nginx/ssl:ro
-    entrypoint: ["/bin/sh", "-c", "/wait-for-wordpress.sh wordpress 9000 && nginx -g 'daemon off;'"]
+    entrypoint: ["/bin/sh", "-c", "/entrypoint.sh wordpress 9000 && nginx -g 'daemon off;'"]
     networks:
       - inception_network
 

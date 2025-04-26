@@ -71,15 +71,22 @@ reset-all:
 #         SETUP
 # ========================
 
+prepare-data:
+	@echo "📂 Creando carpetas de datos si no existen..."
+	mkdir -p ./data/mariadb ./data/wordpress
+	@echo "🛡️ Ajustando permisos de carpetas de datos..."
+	sudo chmod -R 777 ./data
+	@echo "✅ Carpetas listas para usar."
+
 generate-ssl:
 	@echo "$(CYAN)🔐 Generando certificado SSL autofirmado...$(CLEAR)"
-	@mkdir -p ./requirements/nginx/conf/ssl
-	@if [ ! -f ./requirements/nginx/conf/ssl/nginx.key ] || [ ! -f ./requirements/nginx/conf/ssl/nginx.crt ]; then \
+	@mkdir -p ./srcs/requirements/nginx/conf/ssl
+	@if [ ! -f ./srcs/requirements/nginx/conf/ssl/nginx.key ] || [ ! -f ./srcs/requirements/nginx/conf/ssl/nginx.crt ]; then \
 		DOMAIN=$$(grep DOMAIN_NAME .env | cut -d '=' -f2); \
 		openssl req -x509 -nodes -days 365 \
 		-newkey rsa:2048 \
-		-keyout ./requirements/nginx/conf/ssl/nginx.key \
-		-out ./requirements/nginx/conf/ssl/nginx.crt \
+		-keyout ./srcs/requirements/nginx/conf/ssl/nginx.key \
+		-out ./srcs/requirements/nginx/conf/ssl/nginx.crt \
 		-subj "/C=ES/ST=42/L=Inception/O=42/OU=Student/CN=$$DOMAIN"; \
 		echo "$(GREEN)✅ Certificado SSL generado correctamente.$(CLEAR)"; \
 	else \
@@ -140,8 +147,8 @@ check-nginx-response:
 
 check-ssl-cert:
 	@echo "$(MAGENTA)📄 Verificando certificado SSL de Nginx...$(CLEAR)"
-	@test -f ./requirements/nginx/conf/ssl/nginx.crt && echo "$(GREEN)✅ Certificado SSL presente.$(CLEAR)" || echo "$(RED)❌ Certificado SSL no encontrado.$(CLEAR)"
-	@test -f ./requirements/nginx/conf/ssl/nginx.key && echo "$(GREEN)✅ Llave SSL presente.$(CLEAR)" || echo "$(RED)❌ Llave SSL no encontrada.$(CLEAR)"
+	@test -f ./srcs/nginx/conf/ssl/nginx.crt && echo "$(GREEN)✅ Certificado SSL presente.$(CLEAR)" || echo "$(RED)❌ Certificado SSL no encontrado.$(CLEAR)"
+	@test -f ./srcs/nginx/conf/ssl/nginx.key && echo "$(GREEN)✅ Llave SSL presente.$(CLEAR)" || echo "$(RED)❌ Llave SSL no encontrada.$(CLEAR)"
 	@docker exec -it $$(docker ps -qf "name=nginx") test -f /etc/nginx/ssl/nginx.crt && echo "$(GREEN)✅ Certificado presente dentro del contenedor.$(CLEAR)" || echo "$(RED)❌ Certificado no encontrado en el contenedor.$(CLEAR)"
 
 check: check_ports check-secrets check-env check-firewall check-env-vars check-nginx-response check-ssl-cert
@@ -197,7 +204,7 @@ diagnose:
 clean-data:
 	@echo "$(RED)🧹 Eliminando datos persistentes...$(CLEAR)"
 	@sudo rm -rf ./data/mariadb/* ./data/wordpress/*
-	@sudo rm -rf ./requirements/nginx/conf/ssl/*
+	@sudo rm -rf ./srcs/requirements/nginx/conf/ssl/*
 purge-data:
 	@echo "$(RED)🗑️ Borrando completamente la carpeta de datos persistentes...$(CLEAR)"
 	@sudo rm -rf ./data
@@ -212,8 +219,8 @@ monitor: healthcheck
 	@echo "$(MAGENTA)🔍 MONITOREO COMPLETO$(CLEAR)"
 	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 	@docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$(docker ps -q)
-	@openssl x509 -in ./requirements/nginx/conf/ssl/nginx.crt -noout -dates 2>/dev/null || echo "❌ Certificado no encontrado."
-	@test -f ./requirements/nginx/conf/ssl/nginx.crt && echo "✅ Certificado SSL generado en contenedor Nginx." || echo "❌ Certificado SSL no generado."
+	@openssl x509 -in ./srcs/requirements/nginx/conf/ssl/nginx.crt -noout -dates 2>/dev/null || echo "❌ Certificado no encontrado."
+	@test -f ./srcs/requirements/nginx/conf/ssl/nginx.crt && echo "✅ Certificado SSL generado en contenedor Nginx." || echo "❌ Certificado SSL no generado."
 	@docker exec -it $$(docker ps -qf "name=nginx") test -f /etc/nginx/ssl/nginx.crt && echo "✅ Certificado SSL presente dentro del contenedor." || echo "❌ Certificado SSL no presente en el contenedor."
 	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 	@docker logs --tail=10 $$(docker ps -qf "name=wordpress") || echo "⚠️ WordPress no disponible"
@@ -247,9 +254,9 @@ save-logs:
 	@echo "$(GREEN)✅ Todos los logs fueron guardados en '$(LOG_DIR)'$(CLEAR)"
 
 run: build up save-logs
+all: setup check build up
 	@echo "$(MAGENTA)🚀 Ejecutando build + up + save-logs...$(CLEAR)"
 
-all: setup check build up
 
 .PHONY: all \
 		setup \

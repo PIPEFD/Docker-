@@ -6,7 +6,7 @@
 #    By: dbonilla <dbonilla@student.42urduliz.co    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/16 08:16:10 by pipe              #+#    #+#              #
-#    Updated: 2025/04/21 17:37:15 by dbonilla         ###   ########.fr        #
+#    Updated: 2025/04/26 23:49:10 by dbonilla         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,13 +25,13 @@ RUN apt update && apt install -y \
   && chown -R www-data:www-data /var/log/nginx /etc/nginx
 
 # Copiar archivos necesarios
-COPY ./conf/wait-for-wordpress.sh /wait-for-wordpress.sh
+COPY ./conf/entrypoint.sh /entrypoint.sh
 COPY ./conf/default.conf /etc/nginx/sites-available/default 
 COPY ./html/error502.html /usr/share/nginx/html/error502.html
 COPY ./conf/ssl /etc/nginx/ssl
 
 # Permisos
-RUN chmod +x /wait-for-wordpress.sh
+RUN chmod +x /entrypoint.sh
 
 # Exponer puertos
 EXPOSE 443 80
@@ -43,5 +43,5 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Ejecutar Nginx
-ENTRYPOINT ["/wait-for-wordpress.sh", "wordpress", "9000", "&&"]
+ENTRYPOINT ["/entrypoint.sh", "wordpress", "9000", "&&"]
 CMD ["nginx", "-g", "daemon off;"]
