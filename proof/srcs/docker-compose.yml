@@ -1,0 +1,96 @@
+
+services:
+  mariadb:
+    build: ./requirements/mariadb
+    image: mariadb
+    restart: unless-stopped
+    secrets:
+      - db_password
+      - db_root_password
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - ./requirements/mariadb/conf:/docker-entrypoint-initdb.d
+      - ./data/mariadb:/var/lib/mysql
+      - ./requirements/mariadb/conf/my.cnf:/etc/mysql/mariadb.conf.d/99-custom.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inception_network
+
+  wordpress:
+    # build: ./requirements/wordpress
+    build: ./requirements/wordpress
+    image: wordpress
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    secrets:
+      - db_password
+      - credentials
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+      DOMAIN_NAME: ${DOMAIN_NAME:-dbonilla.42.fr}
+      CREDENTIALS_FILE: /run/secrets/credentials
+    volumes:
+      - ./data/wordpress:/var/www/html
+      - ./requirements/wordpress/conf:/docker-entrypoint-initwp.d
+    expose:
+      - "9000"
+    healthcheck:
+        test: ["CMD", "php-fpm7.4", "-t"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+    networks:
+      - inception_network
+
+  nginx:
+    build: ./requirements/nginx
+    image: nginx
+    restart: unless-stopped
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    ports:
+      - "443:443"
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME:-dbonilla.42.fr}
+    volumes:
+      - ./data/wordpress:/var/www/html:ro
+      - ./requirements/nginx/conf/entrypoint.sh:/entrypoint.sh:ro
+      - ./requirements/nginx/conf/ssl:/etc/nginx/ssl:ro
+    entrypoint: ["/bin/sh", "-c", "/entrypoint.sh wordpress 9000 && nginx -g 'daemon off;'"]
+    networks:
+      - inception_network
+
+# ======================
+#        SECRETS
+# ======================
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  credentials:
+    file: ../secrets/credentials.txt
+
+# ======================
+#       NETWORKS
+# ======================
+
+networks:
+  inception_network:
+    driver: bridge
