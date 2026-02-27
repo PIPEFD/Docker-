@@ -8,6 +8,15 @@
 
 
 
+## 📌 Recomendación
+
+Sigue el orden sugerido para una mejor comprensión:
+
+1. Docker.md  
+2. Docker_engine_analisis.md  
+3. Docker_engine_vs_compose.md  
+4. DockerCompose.md  
+5. Inception.md
 
 
 Aquí encontrarás una serie de guías prácticas que explican paso a paso los fundamentos de Docker, su motor principal, la herramienta Docker Compose y la estructura de Inception.
@@ -18,8 +27,8 @@ Accede a cada sección haciendo clic en los enlaces:
 
 - [🔹 Docker - Introducción general](Docker.md)
 - [🔹 Docker Engine - Motor y arquitectura](docker_engine_analisis.md)
+- [🔹 Comparativa Docker Engine vs Compose](Docker_engine_vs_compose.md)
 - [🔹 Docker Compose - Automatización con YAML](DockerCompose.md)
-- [🔹 Comparativa Docker Engine vs Compose](docker_engine_vs_compose.md)
 - [🔹 Proyecto Inception - Estructura y despliegue](Inception.md)
 
 ---
@@ -32,15 +41,6 @@ Cada archivo está organizado para que puedas entender desde lo más básico has
 
 ---
 
-## 📌 Recomendación
-
-Sigue el orden sugerido para una mejor comprensión:
-
-1. Docker.md  
-2. docker_engine_analisis.md  
-3. docker_engine_vs_compose.md  
-4. DockerCompose.md  
-5. Inception.md
 
 ---
 
