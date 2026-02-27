@@ -28,7 +28,7 @@ Accede a cada sección haciendo clic en los enlaces:
 - [🔹 Docker - Introducción general](Docker.md)
 - [🔹 Docker Engine - Motor y arquitectura](Docker_Engine.md)
 - [🔹 Comparativa Docker Engine vs Compose](Docker_Engine_vs_Compose.md)
-- [🔹 Docker Compose - Automatización con YAML](DockerCompose.md)
+- [🔹 Docker Compose - Automatización con YAML](Docker_Compose.md)
 - [🔹 Proyecto Inception - Estructura y despliegue](Inception.md)
 
 ---
