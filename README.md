@@ -26,8 +26,8 @@ Aquí encontrarás una serie de guías prácticas que explican paso a paso los f
 Accede a cada sección haciendo clic en los enlaces:
 
 - [🔹 Docker - Introducción general](Docker.md)
-- [🔹 Docker Engine - Motor y arquitectura](docker_engine_analisis.md)
-- [🔹 Comparativa Docker Engine vs Compose](Docker_engine_vs_compose.md)
+- [🔹 Docker Engine - Motor y arquitectura](Docker_Engine.md)
+- [🔹 Comparativa Docker Engine vs Compose](Docker_Engine_vs_Compose.md)
 - [🔹 Docker Compose - Automatización con YAML](DockerCompose.md)
 - [🔹 Proyecto Inception - Estructura y despliegue](Inception.md)
 
